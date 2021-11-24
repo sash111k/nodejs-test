@@ -58,6 +58,20 @@ class MatchesController{
         const allMatches = await db.query(dbQuery,filterQuery)
         res.json(allMatches.rows)
     }
+
+    async getMatchesForAdmin(req,res){
+        const matches = await db.query(`
+            SELECT matches.id as id, t1.team_name as first_team,first_team_score,
+                   second_team_score,t2.team_name as second_team,
+                   tournaments.tournament_name as tournament, seasons.season as season, full_tournament_name as full_tournament_name
+            from matches
+                     INNER JOIN teams as t1 on t1.id = matches.first_team_id
+                     INNER JOIN teams as t2 on t2.id = matches.second_team_id
+                     INNER JOIN tournaments on matches.tournament_id = tournaments.id
+                     INNER JOIN seasons on matches.season_id = seasons.id
+        `)
+        res.json(matches.rows)
+    }
 }
 
 module.exports = new MatchesController();
